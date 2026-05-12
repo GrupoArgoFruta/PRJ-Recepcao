@@ -41,7 +41,18 @@ const API = {
         }
     },
 
-    async fetchResumo() {
+    async fetchResumo(filtros = {}) {
+        let whereClause;
+        if (filtros.nroUnico) {
+            whereClause = `WHERE MOV.NROUNICO = ${parseInt(filtros.nroUnico) || 0}`;
+        } else if (filtros.dataInicio || filtros.dataFim) {
+            const di = (filtros.dataInicio || filtros.dataFim).replace(/[^0-9\-]/g, '');
+            const df = (filtros.dataFim   || filtros.dataInicio).replace(/[^0-9\-]/g, '');
+            whereClause = `WHERE TRUNC(ENT.DTENTRADA) BETWEEN TO_DATE('${di}', 'YYYY-MM-DD') AND TO_DATE('${df}', 'YYYY-MM-DD')`;
+        } else {
+            whereClause = `WHERE (MOV.DHMOVIMENTACAO >= TRUNC(SYSDATE) OR MOV.DHMOVIMENTACAO IS NULL)`;
+        }
+
         const query = `
             SELECT
                 MOV.NROUNICO,
@@ -54,7 +65,7 @@ const API = {
                 SUM(NVL(MOV.QTDPALLETSBAIXADOS, 0)) AS TOTAL_BAIXADOS
             FROM AD_ROMANEIOENTRMOVSALDO MOV
             INNER JOIN AD_ROMANEIOENTR ENT ON MOV.NROUNICO = ENT.NROUNICO
-            WHERE MOV.DHMOVIMENTACAO >= TRUNC(SYSDATE) OR MOV.DHMOVIMENTACAO IS NULL
+            ${whereClause}
             GROUP BY MOV.NROUNICO, ENT.ROMANEIO, MOV.ETAPA, MOV.STATUS
             ORDER BY MOV.NROUNICO DESC
         `;
@@ -70,17 +81,31 @@ const API = {
     /**
      * Busca todos os pallets detalhados
      */
-    async fetchPallets() {
+    async fetchPallets(filtros = {}) {
+        let whereClause;
+        if (filtros.nroUnico) {
+            whereClause = `WHERE MOV.NROUNICO = ${parseInt(filtros.nroUnico) || 0}`;
+        } else if (filtros.dataInicio || filtros.dataFim) {
+            const di = (filtros.dataInicio || filtros.dataFim).replace(/[^0-9\-]/g, '');
+            const df = (filtros.dataFim   || filtros.dataInicio).replace(/[^0-9\-]/g, '');
+            whereClause = `WHERE MOV.NROUNICO IN (
+                SELECT NROUNICO FROM AD_ROMANEIOENTR
+                WHERE TRUNC(DTENTRADA) BETWEEN TO_DATE('${di}', 'YYYY-MM-DD') AND TO_DATE('${df}', 'YYYY-MM-DD')
+            )`;
+        } else {
+            whereClause = `WHERE (MOV.DHMOVIMENTACAO >= TRUNC(SYSDATE) OR MOV.DHMOVIMENTACAO IS NULL)`;
+        }
+
         const query = `
             SELECT
                 MOV.NROUNICO, MOV.SEQUENCIA, MOV.NROPALLET, MOV.PESOPALLET,
                 MOV.TIPOPALLET, MOV.STATUS, MOV.ETAPA,
                 MOV.ENTRADAKG, MOV.SAIDAKG, MOV.QTDPALLETSBAIXADOS, MOV.OBS,
-                NVL(MOV.NUMPCAMINHAO, 1) AS NUMPCAMINHAO,
+                NVL(TO_CHAR(MOV.NUMPCAMINHAO), '-') AS NUMPCAMINHAO,
                 TO_CHAR(MOV.DHMOVIMENTACAO, 'DD/MM HH24:MI') AS DH_MOV
             FROM AD_ROMANEIOENTRMOVSALDO MOV
-            WHERE (MOV.DHMOVIMENTACAO >= TRUNC(SYSDATE) OR MOV.DHMOVIMENTACAO IS NULL)
-            ORDER BY MOV.NROUNICO DESC, NVL(MOV.NUMPCAMINHAO, 1) ASC, MOV.SEQUENCIA ASC
+            ${whereClause}
+            ORDER BY MOV.NROUNICO DESC, MOV.NUMPCAMINHAO ASC, MOV.SEQUENCIA ASC
         `;
         
         return new Promise((resolve, reject) => {
@@ -201,27 +226,27 @@ const API = {
     async fetchCabecalhoRomaneio(nroUnico) {
         const query = `
             SELECT
-                ent.NROUNICO,
-                Empresa.RAZAOSOCIAL,
-                ender.NOMEEND,
-                Empresa.CGC                                   AS EMP_CNPJ,
-                Empresa.NUMEND,
-                Empresa.COMPLEMENTO,
-                Empresa.TELEFONE,
-                bai.NOMEBAI,
-                cid.NOMECID,
-                ufs.UF,
-                t2.AD_DESCRESUMO                              AS VARIEDADE,
-                TO_CHAR(ent.DTCOMPLOTE, 'DD/MM/YYYY')         AS FICHA_EMBARQUE
-            FROM AD_ROMANEIOENTR ent
-            INNER JOIN TGFPRO t    ON ent.CODPROD      = t.CODPROD
-            INNER JOIN TGFGRU t2   ON t.CODGRUPOPROD   = t2.CODGRUPOPROD
-            LEFT  JOIN TSIEMP Empresa ON ent.CODEMP     = Empresa.CODEMP
-            LEFT  JOIN TSIEND ender   ON Empresa.CODEND = ender.CODEND
-            LEFT  JOIN TSICID cid     ON Empresa.CODCID = cid.CODCID
-            LEFT  JOIN TSIUFS ufs     ON ufs.CODUF      = cid.UF
-            LEFT  JOIN TSIBAI bai     ON bai.CODBAI     = Empresa.CODBAI
-            WHERE ent.NROUNICO = ${parseInt(nroUnico) || 0}
+                ENT.NROUNICO,
+                ENT.ROMANEIO,
+                TO_CHAR(ENT.DTCOLHEITA, 'DD/MM/YYYY')  AS DTCOLHEITA,
+                TO_CHAR(ENT.DTENTRADA,  'DD/MM/YYYY')  AS DTENTRADA,
+                OPTION_LABEL('AD_ROMANEIOENTR','TRATAMENTO', ENT.TRATAMENTO) AS MERCADO,
+                ENT.UP,
+                ENT.CODPARC,
+                PAR.NOMEPARC,
+                ENT.CODAREAP || ' - ' || NVL(AREAPCVW.VALVLOTE, '') AS AREA_VALVULA,
+                GRU.AD_DESCRESUMO AS VARIEDADE,
+                ENT.AD_QTD_CX_CONTENTORES AS QTD_CONTENTORES,
+                CASE WHEN ENT.ORIGEMPESO = 1 THEN 'PESO ROÇA' ELSE 'CAIXA EMBALADA' END AS ORIGEMPESO,
+                (SELECT SUM(NVL(MOV.ENTRADAKG, 0))
+                 FROM AD_ROMANEIOENTRMOVSALDO MOV
+                 WHERE MOV.NROUNICO = ENT.NROUNICO) AS TOTAL_PESO_LIQ
+            FROM AD_ROMANEIOENTR ENT
+            INNER JOIN TGFPAR      PAR      ON ENT.CODPARC       = PAR.CODPARC
+            INNER JOIN TGFPRO      PRO      ON ENT.CODPROD        = PRO.CODPROD
+            INNER JOIN TGFGRU      GRU      ON PRO.CODGRUPOPROD   = GRU.CODGRUPOPROD
+            LEFT  JOIN AD_AREAPARCVW AREAPCVW ON ENT.CODAREAP    = AREAPCVW.CODAREA
+            WHERE ENT.NROUNICO = ${parseInt(nroUnico) || 0}
         `;
         return new Promise((resolve) => {
             executeQuery(query, [],

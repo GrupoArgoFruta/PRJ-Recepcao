@@ -226,6 +226,34 @@
                 </button>
             </section>
 
+            <!-- FILTER BAR -->
+            <section class="filter-bar" data-aos="fade-up" data-aos-delay="250">
+                <div class="filter-group">
+                    <i class="fa-solid fa-filter" style="color:rgba(255,255,255,0.35);"></i>
+                    <input type="number" id="filtroNroUnico" placeholder="Nro. Único (ex: 16425)"
+                        onkeydown="if(event.key==='Enter') aplicarFiltro()" />
+                    <span class="filter-sep">De</span>
+                    <input type="date" id="filtroDataInicio"
+                        onkeydown="if(event.key==='Enter') aplicarFiltro()" />
+                    <span class="filter-sep">Até</span>
+                    <input type="date" id="filtroDataFim"
+                        onkeydown="if(event.key==='Enter') aplicarFiltro()" />
+                    <button class="btn btn-primary btn-filter" onclick="aplicarFiltro()">
+                        <i class="fa-solid fa-magnifying-glass"></i> Filtrar
+                    </button>
+                    <button class="btn btn-filter-clear" onclick="limparFiltro()">
+                        <i class="fa-solid fa-rotate-left"></i> Hoje
+                    </button>
+                    <button class="btn btn-filter-fin" id="btnMostrarFinalizados"
+                            onclick="toggleFinalizados()" style="display:none;">
+                        <i class="fa-solid fa-flag-checkered"></i>
+                        <span id="countFinalizados">0</span>
+                        <span class="fin-label">Ver Finalizados</span>
+                    </button>
+                </div>
+                <span class="filter-status-text" id="filterStatusText"></span>
+            </section>
+
             <!-- OPERATION GRID -->
             <section class="operation-grid">
                 

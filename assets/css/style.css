@@ -1363,4 +1363,140 @@ body::before {
     animation: truckSelectPulse 0.9s ease-out;
 }
 
+/* ---------- FILTER BAR ---------- */
+.filter-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 18px;
+    background: var(--card-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.filter-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    flex: 1;
+}
+
+.filter-bar input[type="number"],
+.filter-bar input[type="date"] {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.12);
+    color: #e0e0e0;
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 13px;
+    height: 36px;
+    outline: none;
+    font-family: 'Inter', sans-serif;
+    transition: border-color 0.2s;
+}
+
+.filter-bar input[type="number"] { width: 170px; }
+.filter-bar input[type="date"]   { width: 145px; color-scheme: dark; }
+
+.filter-sep {
+    font-size: 12px;
+    color: rgba(255,255,255,0.35);
+    white-space: nowrap;
+    font-weight: 500;
+}
+
+.filter-bar input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(168,201,29,0.12);
+}
+
+.btn-filter {
+    height: 36px;
+    padding: 0 14px;
+    font-size: 13px;
+    border-radius: 8px;
+}
+
+.btn-filter-clear {
+    height: 36px;
+    padding: 0 14px;
+    font-size: 13px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.07);
+    color: #aaa;
+    border: 1px solid rgba(255,255,255,0.1);
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.btn-filter-clear:hover { background: rgba(255,255,255,0.13); color: #e0e0e0; }
+
+.btn-filter-fin {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 36px;
+    padding: 0 14px;
+    font-size: 13px;
+    border-radius: 8px;
+    background: rgba(74,222,128,0.1);
+    color: #4ade80;
+    border: 1px solid rgba(74,222,128,0.3);
+    cursor: pointer;
+    transition: background 0.2s;
+    font-weight: 600;
+}
+.btn-filter-fin:hover { background: rgba(74,222,128,0.2); }
+
+.filter-status-text {
+    font-size: 12px;
+    color: var(--accent);
+    white-space: nowrap;
+    font-weight: 600;
+}
+
+/* ---------- CAMINHÃO FINALIZADO ---------- */
+.truck-finalizado-banner {
+    background: rgba(74,222,128,0.1);
+    border: 1px solid rgba(74,222,128,0.3);
+    color: #4ade80;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 5px 12px;
+    border-radius: 6px;
+    text-align: center;
+    margin-bottom: 8px;
+    letter-spacing: 0.5px;
+}
+
+.truck-finalizado-visivel {
+    border-color: rgba(74,222,128,0.25) !important;
+    box-shadow: 0 0 20px rgba(74,222,128,0.08) !important;
+    opacity: 0.85;
+}
+
+@keyframes truckRecemFinalizado {
+    0%   { box-shadow: 0 0 0   rgba(74,222,128,0);    transform: translateX(0) scale(1);    opacity: 1; }
+    15%  { box-shadow: 0 0 40px rgba(74,222,128,0.65); transform: translateX(0) scale(1.01); opacity: 1; }
+    72%  { box-shadow: 0 0 40px rgba(74,222,128,0.45); transform: translateX(0) scale(1.01); opacity: 1; }
+    100% { box-shadow: 0 0 0   rgba(74,222,128,0);    transform: translateX(110%);          opacity: 0; }
+}
+
+.truck-novo-finalizado {
+    animation: truckRecemFinalizado 3.2s cubic-bezier(0.4, 0, 1, 1) forwards;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+@media (max-width: 768px) {
+    .filter-bar { flex-direction: column; align-items: flex-start; }
+    .filter-bar input[type="number"],
+    .filter-bar input[type="date"] { width: 100%; }
+}
+
  

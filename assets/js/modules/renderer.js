@@ -55,41 +55,81 @@ const Renderer = {
     /**
      * Renderiza caminhões agrupados por romaneio
      */
-    renderizarCaminhoes(movimentacoes) {
+    renderizarCaminhoes(movimentacoes, novoFinalizados = []) {
         const container = document.getElementById('truckContainer');
-        if (!container) return;
-        
+        if (!container) return { ativos: [], finalizados: [] };
+
         if (!movimentacoes || movimentacoes.length === 0) {
             container.innerHTML = this._emptyState();
-            return;
+            this._atualizarBadgeFinalizados(0);
+            return { ativos: [], finalizados: [] };
         }
-        
+
         // Agrupar por NROUNICO + NUMPCAMINHAO
         const romaneios = {};
         movimentacoes.forEach(mov => {
             const nroUnico = mov.NROUNICO || '---';
-            const numCaminhao = mov.NUMPCAMINHAO || 1;
+            const numCaminhao = mov.NUMPCAMINHAO || '-';
             if (!romaneios[nroUnico]) romaneios[nroUnico] = {};
             if (!romaneios[nroUnico][numCaminhao]) romaneios[nroUnico][numCaminhao] = [];
             romaneios[nroUnico][numCaminhao].push(mov);
         });
-        
+
+        const novoFinalizadosSet = new Set(novoFinalizados.map(t => `${t.nroUnico}_${t.numCaminhao}`));
+        const forceShowAll = !!(Store.filtros.nroUnico || Store.filtros.data);
+
         container.innerHTML = '';
-        
+        const ativos = [];
+        const finalizados = [];
+
         Object.keys(romaneios).sort().forEach(nroUnico => {
             const caminhoes = romaneios[nroUnico];
-            
-            // Título do Romaneio
-            container.insertAdjacentHTML('beforeend', this._romaneioHeader(nroUnico, caminhoes));
-            
-            // Caminhões
-            Object.keys(caminhoes).sort((a, b) => Number(a) - Number(b)).forEach(numCaminhao => {
+            const trucksDoRomaneio = [];
+
+            Object.keys(caminhoes).sort().forEach(numCaminhao => {
                 const pallets = caminhoes[numCaminhao];
-                container.insertAdjacentHTML('beforeend', this._truckHTML(numCaminhao, pallets, nroUnico));
+                const todosFin = pallets.every(p => p.STATUS === 'FIN');
+                const chave = `${nroUnico}_${numCaminhao}`;
+
+                if (todosFin) {
+                    finalizados.push({ nroUnico, numCaminhao });
+                    const isNovo = novoFinalizadosSet.has(chave);
+
+                    if (!Store.mostrarFinalizados && !isNovo && !forceShowAll) return;
+
+                    const cls = isNovo ? 'truck-novo-finalizado' : (Store.mostrarFinalizados || forceShowAll ? 'truck-finalizado-visivel' : '');
+                    trucksDoRomaneio.push(this._truckHTML(numCaminhao, pallets, nroUnico, cls, true));
+                } else {
+                    ativos.push({ nroUnico, numCaminhao });
+                    trucksDoRomaneio.push(this._truckHTML(numCaminhao, pallets, nroUnico, '', false));
+                }
             });
-            
-            container.insertAdjacentHTML('beforeend', '<hr style="border-color: rgba(255,255,255,0.1); margin: 16px 0;">');
+
+            if (trucksDoRomaneio.length) {
+                container.insertAdjacentHTML('beforeend', this._romaneioHeader(nroUnico, caminhoes));
+                trucksDoRomaneio.forEach(h => container.insertAdjacentHTML('beforeend', h));
+                container.insertAdjacentHTML('beforeend', '<hr style="border-color: rgba(255,255,255,0.1); margin: 16px 0;">');
+            }
         });
+
+        this._atualizarBadgeFinalizados(finalizados.length);
+        return { ativos, finalizados };
+    },
+
+    _atualizarBadgeFinalizados(total) {
+        const el = document.getElementById('countFinalizados');
+        if (el) el.textContent = total;
+
+        const btn = document.getElementById('btnMostrarFinalizados');
+        if (!btn) return;
+        btn.style.display = total > 0 ? 'inline-flex' : 'none';
+
+        const lbl = btn.querySelector('.fin-label');
+        if (lbl) lbl.textContent = Store.mostrarFinalizados ? 'Ocultar Finalizados' : 'Ver Finalizados';
+
+        btn.style.background = Store.mostrarFinalizados
+            ? 'rgba(74,222,128,0.25)'
+            : 'rgba(74,222,128,0.1)';
     },
     
     /**
@@ -139,7 +179,7 @@ const Renderer = {
                 ${Object.values(caminhoes).flat().length} registros</span></div>`;
     },
     
-    _truckHTML(numCaminhao, pallets, nroUnico) {
+    _truckHTML(numCaminhao, pallets, nroUnico, classExtra = '', isFinalizado = false) {
         const total = pallets.length;
         const cols = total === 0 ? 4 : Math.min(Math.max(Math.ceil(total / 2), 3), 8);
 
@@ -149,8 +189,12 @@ const Renderer = {
                    <i class="fa-solid fa-box-open"></i> Sem pallets
                </div>`;
 
+        const finBanner = isFinalizado
+            ? `<div class="truck-finalizado-banner"><i class="fa-solid fa-flag-checkered"></i> FINALIZADO — todos os pallets bipados</div>`
+            : '';
+
         return `
-        <div class="truck-3d-wrapper truck-wrapper"
+        <div class="truck-3d-wrapper truck-wrapper ${classExtra}"
              data-nrounico="${nroUnico}"
              data-numcaminhao="${numCaminhao}">
 
@@ -158,9 +202,11 @@ const Renderer = {
                 <i class="fa-solid fa-circle-check"></i> SELECIONADO
             </div>
 
+            ${finBanner}
+
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
                 <i class="fa-solid fa-truck" style="color:#ff8c1a;font-size:16px;"></i>
-                <span style="color:#fff;font-weight:700;font-size:14px;">🚛 CAMINHÃO ${numCaminhao}</span>
+                <span style="color:#fff;font-weight:700;font-size:14px;">🚛 ${numCaminhao}</span>
                 <span class="truck-header-select" onclick="event.stopPropagation();selecionarCaminhao('${nroUnico}','${numCaminhao}')">
                     <i class="fa-solid fa-hand-pointer" style="font-size:10px;"></i>
                     ${total} pallets · ver saldos

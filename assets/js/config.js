@@ -32,7 +32,7 @@ const CONFIG = {
     PARTICLE_COUNT: 20,
     
     // ============ TRUCK ============
-    MAX_SLOTS: 14,
+    MAX_SLOTS: 30,
     TRUCK_HEIGHT: 140,
     TRUCK_PADDING_BOTTOM: 35,
     

@@ -18,12 +18,19 @@ const Store = {
     currentNroUnico: null,
     movimentacoes: [],
     editandoSequencia: null,
-    
+
+    // Filtros de pesquisa
+    filtros: { nroUnico: '', dataInicio: '', dataFim: '' },
+
+    // Controle de caminhões finalizados
+    trucksAtivos: new Set(),   // keys "nroUnico_numCaminhao" com pallets não-FIN
+    mostrarFinalizados: false,
+
     // UI State
     isDark: true,
     autoRefreshInterval: null,
     selectedTruck: null,
-    
+
     // Métodos
     setMovimentacoes(data) {
         this.movimentacoes = data || [];

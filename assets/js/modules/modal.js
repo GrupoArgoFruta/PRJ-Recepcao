@@ -278,8 +278,8 @@ const ModalInjector = {
         tmp.appendChild(svg);
         try {
             JsBarcode('#tmpbc_single', nroPallet, {
-                format: 'CODE128', width: 2, height: 42,
-                displayValue: true, fontSize: 11, margin: 3,
+                format: 'CODE128', width: 2, height: 60,
+                displayValue: false, margin: 3,
                 background: '#ffffff', lineColor: '#000000'
             });
         } catch(e) {}
@@ -299,8 +299,8 @@ const ModalInjector = {
 
     async imprimirTodasEtiquetas(nroUnico, numCaminhao) {
         const pallets = Store.movimentacoes.filter(
-            m => String(m.NROUNICO)        === String(nroUnico) &&
-                 String(m.NUMPCAMINHAO||1) === String(numCaminhao) &&
+            m => String(m.NROUNICO)          === String(nroUnico) &&
+                 String(m.NUMPCAMINHAO||'-') === String(numCaminhao) &&
                  m.NROPALLET && m.NROPALLET.trim() &&
                  m.STATUS !== 'FIN'
         );
@@ -318,7 +318,7 @@ const ModalInjector = {
         // Abre janela antes do await para não ser bloqueada pelo browser
         const win = window.open('', 'PRINT_ALL', 'width=900,height=700');
         win.document.write(`<!DOCTYPE html><html><head>
-            <title>Etiquetas · Caminhão ${numCaminhao} · ROM #${nroUnico}</title>
+            <title>Etiquetas · ${numCaminhao} · ROM #${nroUnico}</title>
             <style>${this._labelCSS()}</style>
         </head><body>
             <div style="text-align:center;padding:40px;font-family:Arial;color:#555;">
@@ -343,8 +343,8 @@ const ModalInjector = {
             tmpContainer.appendChild(svg);
             try {
                 JsBarcode('#tmpbc_' + i, p.NROPALLET.trim(), {
-                    format: 'CODE128', width: 2, height: 42,
-                    displayValue: true, fontSize: 11, margin: 3,
+                    format: 'CODE128', width: 2, height: 60,
+                    displayValue: false, margin: 3,
                     background: '#ffffff', lineColor: '#000000'
                 });
             } catch(e) { return ''; }
@@ -355,7 +355,7 @@ const ModalInjector = {
 
         win.document.open();
         win.document.write(`<!DOCTYPE html><html><head>
-            <title>Etiquetas · Caminhão ${numCaminhao} · ROM #${nroUnico}</title>
+            <title>Etiquetas · ${numCaminhao} · ROM #${nroUnico}</title>
             <style>${this._labelCSS()}</style>
         </head><body>
             ${labelsHTML}
@@ -385,9 +385,9 @@ const ModalInjector = {
                                     style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 10px;">
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label" style="color: #999; font-size: 12px;">Nº CAMINHÃO</label>
-                                <input type="number" class="form-control" id="frmNumpCaminhao" placeholder="1, 2, 3..."
-                                    style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 10px;">
+                                <label class="form-label" style="color: #999; font-size: 12px;">PLACA VEÍCULO</label>
+                                <input type="text" class="form-control" id="frmNumpCaminhao" placeholder="Ex: HYT8D70"
+                                    style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 10px; text-transform: uppercase;">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label" style="color: #999; font-size: 12px;">ETAPA</label>
@@ -501,7 +501,7 @@ const ModalInjector = {
         };
         
         setVal('frmNroUnico', mov.NROUNICO);
-        setVal('frmNumpCaminhao', mov.NUMPCAMINHAO || '1');
+        setVal('frmNumpCaminhao', mov.NUMPCAMINHAO || '');
         setVal('frmEtapa', mov.ETAPA || 'REC');
         setVal('frmStatus', mov.STATUS || 'APR');
         setVal('frmEntradaKG', mov.ENTRADAKG || '0');
@@ -521,7 +521,7 @@ const ModalInjector = {
         
         return {
             NROUNICO: getVal('frmNroUnico'),
-            NUMPCAMINHAO: getVal('frmNumpCaminhao', '1'),
+            NUMPCAMINHAO: getVal('frmNumpCaminhao', '').toUpperCase(),
             ETAPA: getVal('frmEtapa', 'REC'),
             STATUS: getVal('frmStatus', 'APR'),
             ENTRADAKG: getVal('frmEntradaKG', '0'),
@@ -537,84 +537,107 @@ const ModalInjector = {
     _labelCSS() {
         return `
             *{box-sizing:border-box;margin:0;padding:0;}
-            @page{size:108mm 80mm;margin:1mm;}
-            body{font-family:Arial,sans-serif;background:#fff;width:108mm;}
+            @page{size:A5 portrait;margin:5mm;}
+            body{font-family:Arial,sans-serif;background:#fff;}
             .label-wrap{
-                width:106mm;border:1.5px solid #222;overflow:hidden;
+                width:100%;border:1.5px solid #222;overflow:hidden;
                 page-break-after:always;break-after:page;
                 page-break-inside:avoid;break-inside:avoid;
             }
-            .tbl-header{width:100%;border-collapse:collapse;background:#f0f0f0;border-bottom:1.5px solid #222;}
-            .tbl-header .logo-cell{padding:2px 4px;width:20mm;text-align:center;vertical-align:middle;border-right:1px solid #bbb;}
-            .tbl-header .title-cell{padding:2px 6px;text-align:center;font-size:8pt;font-weight:700;letter-spacing:1px;}
-            .tbl-grid,.tbl-pallet{width:100%;border-collapse:collapse;}
-            .tbl-grid td,.tbl-pallet td{border:0.5px solid #ccc;padding:1px 3px;font-size:6.5pt;vertical-align:middle;line-height:1.3;}
-            .lbl{background:#efefef;font-weight:700;color:#333;white-space:nowrap;width:17mm;}
-            .val{color:#000;}
-            .tbl-pallet td{font-size:7.5pt;font-weight:700;}
-            .barcode-area{text-align:center;padding:1px 2px;border-top:0.5px solid #ccc;}
+            .tbl-header{width:100%;border-collapse:collapse;border-bottom:1.5px solid #222;}
+            .tbl-header .logo-cell{padding:4px 8px;width:28mm;text-align:center;vertical-align:middle;border-right:1px solid #999;}
+            .tbl-header .title-cell{padding:4px 8px;text-align:center;font-size:13pt;font-weight:700;letter-spacing:1px;}
+            .tbl-data{width:100%;border-collapse:collapse;}
+            .tbl-data td{border:0.5px solid #ccc;padding:3px 6px;font-size:9pt;vertical-align:middle;line-height:1.4;}
+            .lbl{background:#f0f0f0;font-weight:700;color:#333;white-space:nowrap;width:22%;}
+            .val{color:#000;width:28%;}
+            .val-bold{font-weight:700;}
+            .tbl-entrada{width:100%;border-collapse:collapse;border-top:1.5px solid #222;}
+            .tbl-entrada td{border:0.5px solid #ccc;padding:3px 6px;font-size:9pt;vertical-align:middle;}
+            .barcode-area{text-align:center;padding:8px 4px;border-top:1.5px solid #222;}
+            .nropallet-num{font-size:20pt;font-weight:700;letter-spacing:3px;margin-bottom:6px;}
             .barcode-area svg{max-width:100%;display:block;margin:0 auto;}
-            @media print{body{padding:0;}}
+            .romaneio-foot{font-size:13pt;font-weight:700;margin-top:6px;}
+            @media print{body{padding:0;margin:0;}}
         `;
     },
 
     _buildLabelHTML(cab, pallet, svgHTML) {
         const nr = (v) => (v != null && String(v).trim() !== '') ? v : '---';
-        const enderecoLinha1 = [cab.NOMEEND, cab.NUMEND, cab.COMPLEMENTO]
-            .filter(v => v && String(v).trim())
-            .join(', ');
-        const cidadeUF = [cab.NOMECID, cab.UF]
-            .filter(v => v && String(v).trim())
-            .join(' - ');
+
+        // Peso por caminhão: soma ENTRADAKG apenas dos pallets deste veículo
+        const numCaminhao = pallet.NUMPCAMINHAO || '-';
+        const palletsCam  = (window.Store?.movimentacoes || []).filter(
+            m => String(m.NROUNICO) === String(pallet.NROUNICO) &&
+                 String(m.NUMPCAMINHAO || '-') === String(numCaminhao)
+        );
+        const pesoCaminhao = palletsCam.length
+            ? palletsCam.reduce((s, m) => s + parseFloat(m.ENTRADAKG || 0), 0)
+            : parseFloat(cab.TOTAL_PESO_LIQ || 0);
+
+        const totalPeso = pesoCaminhao.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
         return `
         <div class="label-wrap">
             <table class="tbl-header">
                 <tr>
                     <td class="logo-cell">
                         <img src="https://argofruta.com/wp-content/uploads/2021/05/Logo-text-green.png"
-                             style="height:26px;object-fit:contain;"
+                             style="height:36px;object-fit:contain;"
                              onerror="this.style.display='none'">
                     </td>
                     <td class="title-cell">CONTROLE DE RECEPÇÃO</td>
                 </tr>
             </table>
-            <table class="tbl-grid">
+            <table class="tbl-data">
                 <tr>
-                    <td class="lbl">PRODUTOR</td>
-                    <td class="val" colspan="3">${nr(cab.RAZAOSOCIAL)}</td>
+                    <td class="lbl">Romaneio:</td>
+                    <td class="val val-bold">${nr(cab.ROMANEIO)}</td>
+                    <td class="lbl">Mercado:</td>
+                    <td class="val">${nr(cab.MERCADO)}</td>
                 </tr>
                 <tr>
-                    <td class="lbl">CNPJ</td>
-                    <td class="val">${nr(cab.EMP_CNPJ)}</td>
-                    <td class="lbl">TELEFONE</td>
-                    <td class="val">${nr(cab.TELEFONE)}</td>
+                    <td class="lbl">Produtor:</td>
+                    <td class="val val-bold" colspan="3">${nr(cab.NOMEPARC)}</td>
                 </tr>
                 <tr>
-                    <td class="lbl">ENDEREÇO</td>
-                    <td class="val" colspan="3">${enderecoLinha1 || '---'}</td>
+                    <td class="lbl">C.P:</td>
+                    <td class="val">${nr(cab.CODPARC)}</td>
+                    <td class="lbl">Área:</td>
+                    <td class="val">${nr(cab.AREA_VALVULA)}</td>
                 </tr>
                 <tr>
-                    <td class="lbl">BAIRRO</td>
-                    <td class="val">${nr(cab.NOMEBAI)}</td>
-                    <td class="lbl">CIDADE/UF</td>
-                    <td class="val">${cidadeUF || '---'}</td>
+                    <td class="lbl">UP:</td>
+                    <td class="val">${nr(cab.UP)}</td>
+                    <td class="lbl">Data de Colheita:</td>
+                    <td class="val">${nr(cab.DTCOLHEITA)}</td>
                 </tr>
                 <tr>
-                    <td class="lbl">VARIEDADE</td>
+                    <td class="lbl">Variedade:</td>
                     <td class="val">${nr(cab.VARIEDADE)}</td>
-                    <td class="lbl">DT. COLHEITA</td>
-                    <td class="val">${nr(cab.FICHA_EMBARQUE)}</td>
+                    <td class="lbl">Modalidade:</td>
+                    <td class="val">${nr(cab.ORIGEMPESO)}</td>
                 </tr>
-            </table>
-            <table class="tbl-pallet">
                 <tr>
-                    <td class="lbl">PALLET Nº</td>
-                    <td class="val" style="font-weight:700;">${nr(pallet.NROPALLET)}</td>
-                    <td class="lbl">PESO</td>
-                    <td class="val" style="font-weight:700;">${pallet.PESOPALLET || 0} KG</td>
+                    <td class="lbl">Total Contentores:</td>
+                    <td class="val">${nr(cab.QTD_CONTENTORES)}</td>
+                    <td class="lbl">Peso Caminhão:</td>
+                    <td class="val val-bold">${totalPeso} KG</td>
                 </tr>
             </table>
-            <div class="barcode-area">${svgHTML}</div>
+            <table class="tbl-entrada">
+                <tr>
+                    <td class="lbl">Entrada:</td>
+                    <td class="val" style="width:28%">${nr(cab.DTENTRADA)}</td>
+                    <td class="lbl" style="font-weight:700;">Placa Veículo:</td>
+                    <td class="val val-bold">${nr(pallet.NUMPCAMINHAO)}</td>
+                </tr>
+            </table>
+            <div class="barcode-area">
+                <div class="nropallet-num">${nr(pallet.NROPALLET)}</div>
+                ${svgHTML}
+                <div class="romaneio-foot">${nr(cab.ROMANEIO)}</div>
+            </div>
         </div>`;
     },
 
