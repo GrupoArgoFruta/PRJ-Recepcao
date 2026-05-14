@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="tht_control_detalhe"
+              language="groovy"
+              pageWidth="270"
+              pageHeight="200"
+              orientation="Landscape"
+              columnWidth="270"
+              leftMargin="0"
+              rightMargin="0"
+              topMargin="0"
+              bottomMargin="0">
+	<property name="ireport.zoom" value="3.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.definition"/>
+
+	<parameter name="PK_SEQUENCIA" class="java.math.BigDecimal" isForPrompting="false">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+
+	<queryString>
+		<![CDATA[SELECT
+    ITM.NROUNICO,
+    TO_CHAR(ITM.DTCOLHEITA, 'DD/MM/YYYY') AS DTCOLHEITA,
+    ITM.QTDCONT,
+    ITM.LOTE,
+    ITM.POSINICIO,
+    ITM.POSFIM
+FROM AD_THTLOTEITEM ITM
+WHERE ITM.SEQUENCIA = $P{PK_SEQUENCIA}
+ORDER BY ITM.SEQITEM]]>
+	</queryString>
+
+	<field name="NROUNICO" class="java.math.BigDecimal"/>
+	<field name="DTCOLHEITA" class="java.lang.String"/>
+	<field name="QTDCONT" class="java.math.BigDecimal"/>
+	<field name="LOTE" class="java.lang.String"/>
+	<field name="POSINICIO" class="java.math.BigDecimal"/>
+	<field name="POSFIM" class="java.math.BigDecimal"/>
+
+	<variable name="SUM_QTDCONT" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{QTDCONT}]]></variableExpression>
+	</variable>
+
+	<!-- HEADER da tabela detalhe -->
+	<title>
+		<band height="12">
+			<staticText>
+				<reportElement x="0" y="0" width="50" height="12"/>
+				<box leftPadding="2">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="5" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Romaneio]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="50" y="0" width="55" height="12"/>
+				<box leftPadding="2">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="5" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Colheita]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="105" y="0" width="45" height="12"/>
+				<box leftPadding="2">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="5" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Qtd. Cont.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="150" y="0" width="40" height="12"/>
+				<box leftPadding="2">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="5" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Lote]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="190" y="0" width="50" height="12"/>
+				<box leftPadding="2">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="5" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Posição]]></text>
+			</staticText>
+		</band>
+	</title>
+
+	<!-- LINHAS de detalhe -->
+	<detail>
+		<band height="12">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="50" height="12"/>
+				<box leftPadding="2">
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="5"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{NROUNICO}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="50" y="0" width="55" height="12"/>
+				<box leftPadding="2">
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="5"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{DTCOLHEITA}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="105" y="0" width="45" height="12"/>
+				<box leftPadding="2">
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="5" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{QTDCONT}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="150" y="0" width="40" height="12"/>
+				<box leftPadding="2">
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="5"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{LOTE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="190" y="0" width="50" height="12"/>
+				<box leftPadding="2">
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="5"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[($F{POSINICIO} != null ? $F{POSINICIO}.toString() : "") + "-" + ($F{POSFIM} != null ? $F{POSFIM}.toString() : "")]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+
+	<!-- TOTAL -->
+	<summary>
+		<band height="14">
+			<staticText>
+				<reportElement x="0" y="0" width="105" height="14"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="6" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total:]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="105" y="0" width="45" height="14"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{SUM_QTDCONT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>
