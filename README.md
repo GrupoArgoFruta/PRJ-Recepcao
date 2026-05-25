@@ -5,8 +5,8 @@
 <h1 align="center">DASH-MOV-RECEPCAO</h1>
 
 <p align="center">
-  <b>Dashboard Operacional — Movimentação de Saldos na Recepção de Frutos</b><br>
-  Módulo: Recepção / Tombador<br>
+  <b>Dashboard Operacional — Recepção de Frutos, Tratamento Hidrotérmico & Seleção do Dia</b><br>
+  Módulos: Recepção / Tombador / Hidrotérmico / Seleção<br>
   Sankhya ERP — Grupo Argo
 </p>
 
@@ -14,6 +14,7 @@
   <img src="https://img.shields.io/badge/Plataforma-Sankhya_ERP-274135?style=flat-square" alt="Sankhya">
   <img src="https://img.shields.io/badge/Frontend-Vanilla_JS_Modular-f7df1e?style=flat-square" alt="JS">
   <img src="https://img.shields.io/badge/Backend-JSP_Java-orange?style=flat-square" alt="JSP">
+  <img src="https://img.shields.io/badge/Relatórios-iReport_JRXML-blueviolet?style=flat-square" alt="iReport">
   <img src="https://img.shields.io/badge/Banco-Oracle-red?style=flat-square" alt="Oracle">
   <img src="https://img.shields.io/badge/Status-Em_Produção-brightgreen?style=flat-square" alt="Status">
 </p>
@@ -23,6 +24,12 @@
 ## 📋 Sobre
 
 Dashboard operacional em tempo real para monitoramento da **movimentação de pallets e KG na recepção de frutos**, integrado ao ERP Sankhya via tabelas customizadas (`AD_ROMANEIOENTRMOVSALDO` / `AD_ROMANEIOENTR`).
+
+O projeto abrange **3 módulos operacionais**:
+
+1. **Recepção / Tombador** — Entrada de caminhões, bipagem de pallets via scanner USB, impressão de etiquetas A5 com código de barras Code 128
+2. **THT Control — Tratamento Hidrotérmico** — Dashboard ao vivo para monitoramento de tratamentos, contentores e itens por tanque/gaiola, com relatório analítico em página separada
+3. **Etiquetas de Seleção do Dia** — Relatórios JRXML (iReport) com QR Code para rastreabilidade dos lotes de seleção hidrotérmica
 
 O operador acompanha a entrada dos caminhões, gerencia pallets individualmente, bipa o código de barras no tombador com leitor USB e imprime etiquetas **CONTROLE DE RECEPÇÃO** (A5 portrait) diretamente pelo browser — tudo na mesma tela, sem troca de módulo.
 
@@ -42,10 +49,14 @@ Com este dashboard, **uma única tela** centraliza: entrada, baixa automática p
 
 ```
 Dash-movimentacao-recepcao-refugo/
-├── primeiro_nivel.jsp                     ← Entry point — carregado pelo Sankhya
+├── primeiro_nivel.jsp                     ← Entry point — Dashboard Recepção (Sankhya)
+├── index.jsp                              ← Entry point — THT Control Hidrotérmico
+├── relatorio.jsp                          ← Relatório Analítico THT (abre em nova aba)
 ├── assets/
 │   ├── css/
-│   │   └── style.css                      ← Tema Dark Glassmorphism (CSS Variables)
+│   │   ├── style.css                      ← Tema Dark Glassmorphism — Recepção
+│   │   ├── base.css                       ← CSS base compartilhado — THT
+│   │   └── tht.css                        ← CSS extensão — THT Control
 │   └── js/
 │       ├── config.js                      ← Constantes, mapeamentos e magic numbers
 │       ├── dashboard.js                   ← Orquestrador principal (init + refresh + filtros)
@@ -57,6 +68,9 @@ Dash-movimentacao-recepcao-refugo/
 │           ├── renderer.js               ← Renderização visual (caminhões SVG, pallets, finalizados)
 │           ├── modal.js                  ← Modais CRUD, bipagem e etiqueta A5
 │           └── events.js                 ← Listeners, debounce e ações do usuário
+├── reports/
+│   ├── tht_control_etiqueta.jrxml         ← Etiqueta Seleção do Dia (mestre) — QR Code
+│   └── tht_control_detalhe.jrxml          ← Sub-relatório detalhe dos lotes por item
 └── README.md
 ```
 
@@ -308,6 +322,123 @@ A barra de filtro (abaixo da busca por pallet) permite consultar romaneios de ou
 
 ---
 
+## 🌡️ THT Control — Tratamento Hidrotérmico
+
+Dashboard ao vivo para acompanhamento do tratamento hidrotérmico de mangas, acessado via `index.jsp`. Permite monitorar tratamentos do dia, contentores processados e itens detalhados por tratamento.
+
+### Tela Principal (`index.jsp`)
+
+- **Sidebar** com navegação: Dashboard (ao vivo), Tratamentos (scroll), Relatórios (nova aba)
+- **Stat Cards**: Tratamentos Hoje, Contentores Hoje — atualizados automaticamente
+- **Filtros**: Período (De/Até), Mercado (Argentina, África do Sul, Chile, Coreia, Uruguai, EUA, Mercosul)
+- **Grid Mestre**: Lista tratamentos com colunas: Seq, Dt. Inclusão, Fiscal Mapa, Fiscal USDA, Contentores, Itens
+- **Painel Detalhe**: Ao clicar em um tratamento, exibe itens com: Variedade, Mercado, Tanque, Contentores, Gaiolas, Início/Fim, Tempo (min)
+- **Paginação** no grid mestre
+- **Tema Dark Glassmorphism** com toggle claro/escuro, relógio ao vivo, partículas animadas
+
+### Mercados disponíveis
+
+| Código | Mercado |
+|--------|---------|
+| `ARG` | Argentina |
+| `ZAF` | África do Sul |
+| `CHL` | Chile |
+| `KOR` | Coreia |
+| `URY` | Uruguai |
+| `USA` | Estados Unidos |
+| `MER` | Mercosul |
+
+### Tabelas envolvidas (THT)
+
+| Tabela | Operação | Descrição |
+|--------|----------|-----------|
+| `AD_HIDROTERMICO` | **READ** | Cabeçalho do tratamento (NRUNICO, DTINCLUSAO, FISCALMAPA, FISCALUSDA, CODUSUINC) |
+| `AD_HIDROITEM` | **READ** | Itens do tratamento (SEQUENCIA, DTINICIO, DTFIM, CONTENTORES, TANQUE, POLPA, GAIOLA, MERCADO, GAIOLAS, TEMPO, CODGRUPOPROD) |
+| `TSIUSU` | **READ** | Usuário que criou o tratamento (`NOMEUSU`) |
+| `TGFGRU` | **READ** | Grupo do produto — variedade (`AD_DESCRESUMO`) |
+
+### Relatório Analítico (`relatorio.jsp`)
+
+Página dedicada de relatório, aberta em nova aba via sidebar. Exibe dados tabulares agrupados por tratamento com todos os campos de detalhe.
+
+- **Filtros**: Período (últimos 30 dias por padrão), Mercado
+- **Agrupamento**: Registros agrupados por tratamento com cabeçalho visual destacado
+- **Colunas**: N° Trat, Dt. Inclusão, Fiscal Mapa, Fiscal USDA, Usuário, Seq, Início, Fim, Tempo Total (HH:MM:SS calculado), Contentores, Tanque, Variedade, Polpa, Gaiola, Mercado, Gaiolas, Tempo(min)
+- **Impressão**: Botão "Imprimir" com CSS `@media print` otimizado (cores claras, fundo branco)
+- **Rodapé**: Totalizadores — Total de tratamentos + Total de itens
+
+### Fluxo do THT
+
+```mermaid
+flowchart TD
+    A[Frutos chegam para tratamento] --> B[Fiscal registra tratamento no Sankhya]
+    B --> C[Operador abre THT Control]
+    C --> D[Dashboard exibe tratamentos do dia]
+    D --> E[Clique no tratamento → painel detalhe]
+    E --> F[Visualiza itens: tanque, gaiola, tempo, mercado]
+    F --> G{Precisa de relatório?}
+    G -- Sim --> H[Abre Relatório Analítico em nova aba]
+    H --> I[Filtra por período e mercado]
+    I --> J[Imprime relatório agrupado]
+    G -- Não --> K[Acompanha tratamentos ao vivo]
+
+    style A fill:#0b5c39,color:#fff,stroke:#274135
+    style H fill:#a8c91d,color:#000,stroke:#274135
+    style J fill:#4ade80,color:#000,stroke:#274135
+```
+
+---
+
+## 🏷️ Etiquetas de Seleção do Dia (JRXML / iReport)
+
+Relatórios JRXML para impressão de etiquetas da seleção hidrotérmica, executados pelo Sankhya via iReport. A etiqueta mestre (`tht_control_etiqueta.jrxml`) inclui um sub-relatório de detalhe (`tht_control_detalhe.jrxml`).
+
+### Etiqueta Mestre — `tht_control_etiqueta.jrxml`
+
+- **Tamanho**: 396×283 pts (landscape) — formato compacto para impressora de etiquetas
+- **Parâmetro**: `PK_SEQUENCIA` (BigDecimal) — sequência da seleção do dia
+- **Header**: Título "THT CONTROL ARGO", Data de Seleção, Mercado (via `OPTION_LABEL`), Tempo (min)
+- **Grid de Itens**: Romaneio, Produtor, UP, Variedade — uma linha por lote/romaneio
+- **Bloco Resumo**:
+  - Calibre (concatenado por `LISTAGG` com separador ` | `)
+  - Gaiola (fonte 16pt, destaque visual)
+  - Lote
+  - **QR Code** gerado via ZXing (`com.google.zxing.qrcode.QRCodeWriter`) — 800×800px, contém dados completos da seleção
+
+### Dados codificados no QR Code
+
+O QR Code embute uma string estruturada com pipe como separador:
+
+```
+SEQ:{sequencia}|Gaiola:{idgaiola}|Mercado:{descricao}|Tanque:{tanque}|Tempo:{tempo}min|Selecao:{data}|Itens:ROM:{nrounico};Prod:{produtor};Var:{variedade};Cont:{qtdcont};Pos:{inicio}-{fim}||...
+```
+
+### Sub-relatório Detalhe — `tht_control_detalhe.jrxml`
+
+- **Tamanho**: 270×200 pts (landscape) — embutido na etiqueta mestre
+- **Parâmetro**: `PK_SEQUENCIA` — recebe do relatório pai
+- **Colunas**: Romaneio (`NROUNICO`), Colheita (`DTCOLHEITA`), Qtd. Cont. (`QTDCONT`), Lote, Posição (`POSINICIO-POSFIM`)
+- **Totalização**: Soma da `QTDCONT` no rodapé
+
+### Tabelas envolvidas (Etiquetas)
+
+| Tabela | Operação | Descrição |
+|--------|----------|-----------|
+| `AD_ROMANEIOENTSELCDIA` | **READ** | Seleção do dia — cabeçalho (SEQUENCIA, IDGAIOLA, TEMPO, TANQUE, DTSELECAO, MERCADO) |
+| `AD_THTLOTEITEM` | **READ** | Itens do lote de seleção (NROUNICO, SEQITEM, QTDCONT, LOTE, POSINICIO, POSFIM, UP, CALIBRE) |
+| `AD_ROMANEIOENTR` | **READ** | Romaneio — link para CODPARC e CODPROD |
+| `TGFPAR` | **READ** | Produtor (`NOMEPARC`) |
+| `TGFPRO` | **READ** | Produto — link para grupo |
+| `TGFGRU` | **READ** | Variedade (`AD_DESCRESUMO`) |
+
+### Dependências
+
+- **ZXing** (Google) — Geração de QR Code (`com.google.zxing.qrcode.QRCodeWriter` + `MatrixToImageWriter`)
+- **iReport / JasperReports** — Engine de relatórios do Sankhya
+- Sub-relatório referenciado via `$P{SUBREPORT_DIR} + "tht_control_detalhe.jrxml"`
+
+---
+
 ## 📜 Changelog
 
 | Versão | Data | Tipo | Descrição |
@@ -328,6 +459,9 @@ A barra de filtro (abaixo da busca por pallet) permite consultar romaneios de ou
 | 2.5.0 | 2026-05-12 | `feat` | Filtro por período (De/Até) e por Nro. Único com SQL BETWEEN na DTENTRADA |
 | 2.5.1 | 2026-05-12 | `feat` | Controle de finalizados: animação de saída, badge "Ver Finalizados", ocultação automática |
 | 2.5.2 | 2026-05-12 | `fix` | Peso na etiqueta corrigido para total por caminhão (NUMPCAMINHAO), não por romaneio |
+| 3.0.0 | 2026-05-13 | `feat` | THT Control — Dashboard Hidrotérmico ao vivo (`index.jsp`): grid mestre, painel detalhe, stat cards, filtros por período/mercado |
+| 3.1.0 | 2026-05-13 | `feat` | Relatório Analítico THT (`relatorio.jsp`): agrupamento por tratamento, tempo total calculado, impressão otimizada |
+| 3.2.0 | 2026-05-13 | `feat` | Etiquetas de Seleção do Dia — JRXML mestre + sub-relatório com QR Code (ZXing), calibre, gaiola e posição |
 
 ---
 
@@ -336,7 +470,7 @@ A barra de filtro (abaixo da busca por pallet) permite consultar romaneios de ou
 | | |
 |---|---|
 | **Desenvolvedor** | Natanael Lopes — Grupo Argo (Argo Fruta) |
-| **Módulo** | Recepção / Tombador — Sankhya ERP |
+| **Módulo** | Recepção / Tombador / Hidrotérmico / Seleção — Sankhya ERP |
 | **Contato** | natanael.lopes@argofruta.com |
 
 ---
