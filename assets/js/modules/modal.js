@@ -254,7 +254,7 @@ const ModalInjector = {
         if (!nroPallet || typeof JsBarcode === 'undefined') return;
 
         // Abre antes do await para não ser bloqueada pelo browser
-        const win = window.open('', 'PRINT', 'width=420,height=400');
+        const win = window.open('', 'PRINT', 'width=560,height=420');
         win.document.write(`<!DOCTYPE html><html><head>
             <title>Etiqueta - ${nroPallet}</title>
             <style>${this._labelCSS()}</style>
@@ -278,7 +278,7 @@ const ModalInjector = {
         tmp.appendChild(svg);
         try {
             JsBarcode('#tmpbc_single', nroPallet, {
-                format: 'CODE128', width: 2, height: 60,
+                format: 'CODE128', width: 2, height: 35,
                 displayValue: false, margin: 3,
                 background: '#ffffff', lineColor: '#000000'
             });
@@ -343,7 +343,7 @@ const ModalInjector = {
             tmpContainer.appendChild(svg);
             try {
                 JsBarcode('#tmpbc_' + i, p.NROPALLET.trim(), {
-                    format: 'CODE128', width: 2, height: 60,
+                    format: 'CODE128', width: 2, height: 35,
                     displayValue: false, margin: 3,
                     background: '#ffffff', lineColor: '#000000'
                 });
@@ -537,27 +537,28 @@ const ModalInjector = {
     _labelCSS() {
         return `
             *{box-sizing:border-box;margin:0;padding:0;}
-            @page{size:A5 portrait;margin:5mm;}
-            body{font-family:Arial,sans-serif;background:#fff;}
+            @page{size:140mm 100mm;margin:3mm;}
+            body{font-family:Arial,sans-serif;background:#fff;height:94mm;margin:0;padding:0;}
             .label-wrap{
-                width:100%;border:1.5px solid #222;overflow:hidden;
+                width:100%;height:100%;border:1.5px solid #222;overflow:hidden;
                 page-break-after:always;break-after:page;
                 page-break-inside:avoid;break-inside:avoid;
+                display:flex;flex-direction:column;
             }
-            .tbl-header{width:100%;border-collapse:collapse;border-bottom:1.5px solid #222;}
-            .tbl-header .logo-cell{padding:4px 8px;width:28mm;text-align:center;vertical-align:middle;border-right:1px solid #999;}
-            .tbl-header .title-cell{padding:4px 8px;text-align:center;font-size:13pt;font-weight:700;letter-spacing:1px;}
-            .tbl-data{width:100%;border-collapse:collapse;}
-            .tbl-data td{border:0.5px solid #ccc;padding:3px 6px;font-size:9pt;vertical-align:middle;line-height:1.4;}
+            .tbl-header{width:100%;border-collapse:collapse;border-bottom:1.5px solid #222;flex-shrink:0;}
+            .tbl-header .logo-cell{padding:2px 4px;width:20mm;text-align:center;vertical-align:middle;border-right:1px solid #999;}
+            .tbl-header .title-cell{padding:2px 4px;text-align:center;font-size:9pt;font-weight:700;letter-spacing:1px;}
+            .tbl-data{width:100%;border-collapse:collapse;flex-shrink:0;}
+            .tbl-data td{border:0.5px solid #ccc;padding:1px 4px;font-size:6.5pt;vertical-align:middle;line-height:1.3;}
             .lbl{background:#f0f0f0;font-weight:700;color:#333;white-space:nowrap;width:22%;}
             .val{color:#000;width:28%;}
             .val-bold{font-weight:700;}
-            .tbl-entrada{width:100%;border-collapse:collapse;border-top:1.5px solid #222;}
-            .tbl-entrada td{border:0.5px solid #ccc;padding:3px 6px;font-size:9pt;vertical-align:middle;}
-            .barcode-area{text-align:center;padding:8px 4px;border-top:1.5px solid #222;}
-            .nropallet-num{font-size:20pt;font-weight:700;letter-spacing:3px;margin-bottom:6px;}
+            .tbl-entrada{width:100%;border-collapse:collapse;border-top:1.5px solid #222;flex-shrink:0;}
+            .tbl-entrada td{border:0.5px solid #ccc;padding:1px 4px;font-size:6.5pt;vertical-align:middle;}
+            .barcode-area{flex:1;text-align:center;padding:4px 2px;border-top:1.5px solid #222;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+            .nropallet-num{font-size:11pt;font-weight:700;letter-spacing:2px;margin-bottom:3px;}
             .barcode-area svg{max-width:100%;display:block;margin:0 auto;}
-            .romaneio-foot{font-size:13pt;font-weight:700;margin-top:6px;}
+            .romaneio-foot{font-size:8pt;font-weight:700;margin-top:3px;}
             @media print{body{padding:0;margin:0;}}
         `;
     },

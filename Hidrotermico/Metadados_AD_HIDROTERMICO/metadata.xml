@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<metadata>
+  <exportInfo>
+    <exportTime>16/05/2026 11:25:45</exportTime>
+    <systemVersion>4.35b613</systemVersion>
+    <systemCharSet>ISO-8859-1</systemCharSet>
+    <dbMetadata>
+      <dbUser>SANKHYA</dbUser>
+      <urlConnection><![CDATA[jdbc:oracle:thin:@192.168.5.100:1521/sankhyaw.corporativo.local]]></urlConnection>
+      <jdbcDriver><![CDATA[Oracle JDBC driver 19.3.0.0.0]]></jdbcDriver>
+      <DBMS><![CDATA[Oracle - Oracle Database 19c Standard Edition 2 Release 19.0.0.0.0 - Production
+Version 19.9.0.0.0]]></DBMS>
+    </dbMetadata>
+  </exportInfo>
+  <instances>
+    <instance name="AD_HIDROITEM" isUpdate="false">
+      <instanceDescription><![CDATA[Item do hidrotermico]]></instanceDescription>
+      <tableInfo name="AD_HIDROITEM" sequenceType="A" sequenceField="SEQUENCIA">
+        <category><![CDATA[Romaneio de Entrada]]></category>
+        <tableDescription><![CDATA[HIDROITEM]]></tableDescription>
+        <primaryKey>
+          <NRUNICO />
+          <SEQUENCIA />
+        </primaryKey>
+      </tableInfo>
+      <fields>
+        <field name="SEQUENCIA" systemField="N" dataType="I" presentationType="P" calculated="N" allowSearch="S" allowDefault="S" visibleOnSearch="S" allowNull="N">
+          <description><![CDATA[Tratamento]]></description>
+          <properties>
+            <prop name="nullable"><![CDATA[S]]></prop>
+            <prop name="visivel"><![CDATA[S]]></prop>
+            <prop name="readOnly"><![CDATA[S]]></prop>
+            <prop name="requerido"><![CDATA[N]]></prop>
+            <prop name="combobox"><![CDATA[N]]></prop>
+          </properties>
+        </field>
+        <field name="NRUNICO" systemField="N" dataType="I" presentationType="P" calculated="N" allowSearch="S" allowDefault="S" visibleOnSearch="S" allowNull="N">
+          <description><![CDATA[Nr.Unico]]></description>
+          <properties>
+            <prop name="nullable"><![CDATA[S]]></prop>
+            <prop name="visivel"><![CDATA[S]]></prop>
+            <prop name="readOnly"><![CDATA[S]]></prop>
+            <prop name="requerido"><![CDATA[N]]></prop>
+            <prop name="combobox"><![CDATA[N]]></prop>
+          </properties>
+        </field>
+        <field name="DTINICIO" systemField="N" dataType="H" presentationType="P" calculated="N" allowSearch="N" allowDefault="S" visibleOnSearch="S" allowNull="S">
+          <description><![CDATA[Data de inicio]]></description>
+        </field>
+        <field name="DTFIM" systemField="N" dataType="H" presentationType="P" calculated="N" allowSearch="N" allowDefault="S" visibleOnSearch="S" allowNull="S">
+          <description><![CDATA[Data de fim]]></description>
+        </field>
+        <field name="CONTENTORES" systemField="N" dataType="I" presentationType="P" calculated="N" allowSearch="N" allowDefault="S" visibleOnSearch="S" allowNull="S">
+          <description><![CDATA[Contentores]]></description>
+          <properties>
+            <prop name="nullable"><![CDATA[S]]></prop>
+            <prop name="visivel"><![CDATA[S]]></prop>
+            <prop name="readOnly"><![CDATA[N]]></prop>
+            <prop name="requerido"><![CDATA[N]]></prop>
+            <prop name="combobox"><![CDATA[N]]></prop>
+            <prop name="gridFooterOper"><![CDATA[sum]]></prop>
+          </properties>
+        </field>
+        <field name="TANQUE" systemField="N" dataType="I" presentationType="P" calculated="N" allowSearch="N" allowDefault="S" visibleOnSearch="S" allowNull="S">
+          <description><![CDATA[Tanque]]></description>
+          <properties>
+            <prop name="nullable"><![CDATA[S]]></prop>
+            <prop name="visivel"><![CDATA[S]]></prop>
+            <prop name="readOnly"><![CDATA[N]]></prop>
+            <prop name="requerido"><![CDATA[N]]></prop>
+            <prop name="combobox"><![CDATA[N]]></prop>
+          </properties>
+        </field>
+        <field name="IMCOMPLETO" systemField="N" dataType="I" presentationType="P" calculated="N" allowSearch="N" allowDefault="S" visibleOnSearch="S" allowNull="S">
+          <description><![CDATA[Imcompleto]]></description>
+        </field>
+        <field name="CODGRUPOPROD" systemField="N" dataType="I" presentationType="P" calculated="N" allowSearch="S" allowDefault="S" visibleOnSearch="S" allowNull="S" size="10">
+          <description><![CDATA[Variedade]]></description>
+          <properties>
+            <prop name="apresentacao"><![CDATA[AD_DESCRESUMO]]></prop>
+          </properties>
+        </field>
+        <field name="POLPA" systemField="N" dataType="F" presentationType="P" calculated="N" allowSearch="N" allowDefault="S" visibleOnSearch="S" allowNull="S">
+          <description><![CDATA[Polpa]]></description>
+          <properties>
+            <prop name="nullable"><![CDATA[S]]></prop>
+            <prop name="visivel"><![CDATA[S]]></prop>
+            <prop name="nuCasasDecimais"><![CDATA[2]]></prop>
+            <prop name="readOnly"><![CDATA[N]]></prop>
+            <prop name="requerido"><![CDATA[N]]></prop>
+            <prop name="combobox"><![CDATA[N]]></prop>
+          </properties>
+        </field>
+        <field name="GAIOLA" systemField="N" dataType="S" presentationType="P" calculated="N" allowSearch="N" allowDefault="S" visibleOnSearch="S" allowNull="S">
+          <description><![CDATA[N° de Gaiolas]]></description>
+        </field>
+        <field name="MERCADO" systemField="N" dataType="S" presentationType="O" calculated="N" allowSearch="N" allowDefault="S" visibleOnSearch="S" allowNull="S">
+          <description><![CDATA[Mercado]]></description>
+          <options>
+            <option value="ARG"><![CDATA[Argentina]]></option>
+            <option value="ZAF"><![CDATA[África do Sul]]></option>
+            <option value="CHL"><![CDATA[Chile]]></option>
+            <option value="KOR"><![CDATA[Coreia]]></option>
+            <option value="URY"><![CDATA[Uruguai]]></option>
+            <option value="USA"><![CDATA[Estados Unidos]]></option>
+            <option value="MER" default="S"><![CDATA[Mercosul]]></option>
+          </options>
+        </field>
+        <field name="GAIOLAS" systemField="N" dataType="I" presentationType="P" calculated="N" allowSearch="N" allowDefault="S" visibleOnSearch="S" allowNull="S">
+          <description><![CDATA[Qntd. Gaiolas]]></description>
+          <properties>
+            <prop name="nullable"><![CDATA[S]]></prop>
+            <prop name="visivel"><![CDATA[S]]></prop>
+            <prop name="readOnly"><![CDATA[N]]></prop>
+            <prop name="requerido"><![CDATA[N]]></prop>
+            <prop name="combobox"><![CDATA[N]]></prop>
+            <prop name="gridFooterOper"><![CDATA[sum]]></prop>
+          </properties>
+        </field>
+        <field name="TEMPOTOTAL" systemField="N" dataType="S" presentationType="H" calculated="N" allowSearch="N" allowDefault="S" visibleOnSearch="S" allowNull="S">
+          <description><![CDATA[Tempo total]]></description>
+          <expression><![CDATA[if ($col_DTINICIO != null && $col_DTFIM != null) {
+    // Calcula a diferença em milissegundos
+    long ini = $col_DTINICIO.getTime();
+    long fim = $col_DTFIM.getTime();
+    long diff = fim - ini;
+    
+    // Converte para minutos totais
+    long totalMinutos = diff / 60000;
+    
+    // Calcula Horas e Minutos separadamente
+    long h = totalMinutos / 60;
+    long m = totalMinutos % 60;
+
+    // Monta a String com zero à esquerda manualmente
+    String sh = (h < 10) ? "0" + h : "" + h;
+    String sm = (m < 10) ? "0" + m : "" + m;
+    
+    String tempoFormatado = sh + ":" + sm;
+
+    // Retorna o HTML para o Sankhya exibir formatado
+    return "<b><span style='color: #00008B; font-size: 12px;'>" + tempoFormatado + "</span></b>";
+}
+return null;]]></expression>
+          <properties>
+            <prop name="nullable"><![CDATA[S]]></prop>
+            <prop name="visivel"><![CDATA[S]]></prop>
+            <prop name="readOnly"><![CDATA[S]]></prop>
+            <prop name="requerido"><![CDATA[N]]></prop>
+            <prop name="combobox"><![CDATA[N]]></prop>
+          </properties>
+        </field>
+        <field name="TEMPO" systemField="N" dataType="I" presentationType="P" calculated="N" allowSearch="N" allowDefault="S" visibleOnSearch="S" allowNull="S">
+          <description><![CDATA[Tempo]]></description>
+        </field>
+      </fields>
+      <relationShip>
+        <relation entityName="GrupoProduto" type="I" insert="N" update="N" remove="N">
+          <targetInfo systemInstance="S" tableName="TGFGRU" />
+          <fields>
+            <field localName="CODGRUPOPROD" targetName="CODGRUPOPROD" />
+          </fields>
+        </relation>
+      </relationShip>
+    </instance>
+    <instance name="AD_HIDROTERMICO" isUpdate="false">
+      <instanceDescription><![CDATA[Hidrotérmico]]></instanceDescription>
+      <tableInfo name="AD_HIDROTERMICO" sequenceType="A" sequenceField="NRUNICO">
+        <category><![CDATA[Romaneio de Entrada]]></category>
+        <tableDescription><![CDATA[HIDROTERMICO]]></tableDescription>
+        <primaryKey>
+          <NRUNICO />
+        </primaryKey>
+      </tableInfo>
+      <fields>
+        <field name="NRUNICO" systemField="N" dataType="I" presentationType="P" calculated="N" allowSearch="S" allowDefault="S" visibleOnSearch="S" allowNull="N" size="10">
+          <description><![CDATA[Nr.Unico]]></description>
+          <properties>
+            <prop name="nullable"><![CDATA[S]]></prop>
+            <prop name="visivel"><![CDATA[S]]></prop>
+            <prop name="readOnly"><![CDATA[S]]></prop>
+            <prop name="requerido"><![CDATA[N]]></prop>
+            <prop name="combobox"><![CDATA[N]]></prop>
+          </properties>
+        </field>
+        <field name="FISCALMAPA" systemField="N" dataType="S" presentationType="P" calculated="N" allowSearch="N" allowDefault="S" visibleOnSearch="S" allowNull="S">
+          <description><![CDATA[Fiscal Mapa]]></description>
+          <properties>
+            <prop name="filterConsFilLig"><![CDATA[S]]></prop>
+            <prop name="filterVoidExpression"><![CDATA[N]]></prop>
+            <prop name="filterKeepLast"><![CDATA[S]]></prop>
+            <prop name="filterOrder"><![CDATA[1]]></prop>
+            <prop name="filterRequired"><![CDATA[N]]></prop>
+            <prop name="filterLabel"><![CDATA[Fiscal Mapa]]></prop>
+            <prop name="filterType"><![CDATA[default]]></prop>
+          </properties>
+        </field>
+        <field name="FISCALUSDA" systemField="N" dataType="S" presentationType="P" calculated="N" allowSearch="N" allowDefault="S" visibleOnSearch="S" allowNull="S">
+          <description><![CDATA[Fiscal Usda]]></description>
+        </field>
+        <field name="DTINCLUSAO" systemField="N" dataType="H" presentationType="P" calculated="N" allowSearch="N" allowDefault="S" visibleOnSearch="S" allowNull="S">
+          <description><![CDATA[Data da Inclusão]]></description>
+          <expression><![CDATA[if ($col_DTINCLUSAO == null) {
+  return $ctx_dh_atual;
+} else {
+  return $col_DTINCLUSAO;
+}]]></expression>
+          <properties>
+            <prop name="filterConsFilLig"><![CDATA[S]]></prop>
+            <prop name="filterVoidExpression"><![CDATA[N]]></prop>
+            <prop name="filterKeepLast"><![CDATA[S]]></prop>
+            <prop name="nullable"><![CDATA[S]]></prop>
+            <prop name="filterOrder"><![CDATA[0]]></prop>
+            <prop name="visivel"><![CDATA[S]]></prop>
+            <prop name="filterRequired"><![CDATA[N]]></prop>
+            <prop name="readOnly"><![CDATA[S]]></prop>
+            <prop name="requerido"><![CDATA[N]]></prop>
+            <prop name="combobox"><![CDATA[N]]></prop>
+            <prop name="filterLabel"><![CDATA[Data da Inclusão]]></prop>
+            <prop name="filterType"><![CDATA[period]]></prop>
+          </properties>
+        </field>
+        <field name="CODUSUINC" systemField="N" dataType="I" presentationType="P" calculated="N" allowSearch="S" allowDefault="S" visibleOnSearch="S" allowNull="S" size="5">
+          <description><![CDATA[Cód. Usuário]]></description>
+          <expression><![CDATA[if ($col_CODUSUINC == null) {
+  return $ctx_usuario_logado;
+} else {
+  return $col_CODUSUINC;
+}]]></expression>
+          <properties>
+            <prop name="filterConsFilLig"><![CDATA[S]]></prop>
+            <prop name="filterVoidExpression"><![CDATA[N]]></prop>
+            <prop name="filterKeepLast"><![CDATA[S]]></prop>
+            <prop name="nullable"><![CDATA[S]]></prop>
+            <prop name="filterOrder"><![CDATA[2]]></prop>
+            <prop name="visivel"><![CDATA[S]]></prop>
+            <prop name="filterRequired"><![CDATA[N]]></prop>
+            <prop name="readOnly"><![CDATA[S]]></prop>
+            <prop name="requerido"><![CDATA[N]]></prop>
+            <prop name="combobox"><![CDATA[N]]></prop>
+            <prop name="filterLabel"><![CDATA[Cód. Usuário]]></prop>
+            <prop name="filterType"><![CDATA[default]]></prop>
+          </properties>
+        </field>
+      </fields>
+      <relationShip>
+        <relation entityName="Usuario" type="I" insert="N" update="N" remove="N">
+          <targetInfo systemInstance="S" tableName="TSIUSU" />
+          <fields>
+            <field localName="CODUSUINC" targetName="CODUSU" />
+          </fields>
+        </relation>
+        <relation entityName="AD_HIDROITEM" type="I" insert="N" update="N" remove="S">
+          <targetInfo systemInstance="N" tableName="AD_HIDROITEM" />
+          <fields>
+            <field localName="NRUNICO" targetName="NRUNICO" />
+          </fields>
+        </relation>
+      </relationShip>
+    </instance>
+  </instances>
+</metadata>
+

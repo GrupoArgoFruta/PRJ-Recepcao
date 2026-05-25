@@ -23,6 +23,9 @@
     ITM.UP,
     PAR.NOMEPARC         AS PRODUTOR,
     GRU.AD_DESCRESUMO    AS VARIEDADE,
+(SELECT LISTAGG(I.CALIBRE, ' | ') WITHIN GROUP (ORDER BY I.SEQITEM)
+     FROM AD_THTLOTEITEM I
+     WHERE I.SEQUENCIA = SEL.SEQUENCIA) AS CALIBRE,
     (SELECT
     'SEQ:' || TO_CHAR(SEL.SEQUENCIA)
     || '|Gaiola:' || NVL(TO_CHAR(SEL.IDGAIOLA), '-')
@@ -56,7 +59,6 @@ ORDER BY ITM.SEQITEM]]>
 	<field name="SEQUENCIA" class="java.math.BigDecimal"/>
 	<field name="IDGAIOLA" class="java.lang.String"/>
 	<field name="TEMPO" class="java.math.BigDecimal"/>
-	<field name="TANQUE" class="java.math.BigDecimal"/>
 	<field name="DTSELECAO" class="java.lang.String"/>
 	<field name="DESC_MERCADO" class="java.lang.String"/>
 	<field name="NROUNICO" class="java.math.BigDecimal"/>
@@ -65,66 +67,53 @@ ORDER BY ITM.SEQITEM]]>
 	<field name="PRODUTOR" class="java.lang.String"/>
 	<field name="VARIEDADE" class="java.lang.String"/>
 	<field name="QR_DATA" class="java.lang.String"/>
+	<field name="CALIBRE" class="java.lang.String"/>
 	<title>
 		<band height="48" splitType="Stretch">
 			<staticText>
 				<reportElement x="70" y="2" width="220" height="20"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="12" isBold="true"/>
+					<font size="14" isBold="true"/>
 				</textElement>
 				<text><![CDATA[THT CONTROL ARGO]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="290" y="2" width="100" height="8"/>
 				<textElement textAlignment="Right">
-					<font size="5" isItalic="true"/>
+					<font size="6" isItalic="true"/>
 				</textElement>
 				<text><![CDATA[Data de Seleção:]]></text>
 			</staticText>
 			<textField isBlankWhenNull="true">
-				<reportElement x="290" y="10" width="100" height="12"/>
+				<reportElement x="290" y="10" width="100" height="14"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="8" isBold="true"/>
+					<font size="10" isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{DTSELECAO}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="2" y="24" width="48" height="16"/>
+				<reportElement x="2" y="22" width="56" height="22"/>
 				<textElement verticalAlignment="Middle">
-					<font size="7"/>
+					<font size="12"/>
 				</textElement>
 				<text><![CDATA[Mercado:]]></text>
 			</staticText>
 			<textField isBlankWhenNull="true">
-				<reportElement x="50" y="24" width="90" height="16"/>
+				<reportElement x="58" y="22" width="212" height="22"/>
 				<textElement verticalAlignment="Middle">
-					<font size="11" isBold="true"/>
+					<font size="12" isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{DESC_MERCADO}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="160" y="24" width="40" height="16"/>
+				<reportElement x="270" y="24" width="35" height="20"/>
 				<textElement verticalAlignment="Middle">
-					<font size="7"/>
-				</textElement>
-				<text><![CDATA[Tanque:]]></text>
-			</staticText>
-			<textField isBlankWhenNull="true">
-				<reportElement x="200" y="24" width="50" height="16"/>
-				<textElement verticalAlignment="Middle">
-					<font size="11" isBold="true"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{TANQUE} != null ? String.format("%02d", $F{TANQUE}.intValue()) : ""]]></textFieldExpression>
-			</textField>
-			<staticText>
-				<reportElement x="270" y="24" width="35" height="16"/>
-				<textElement verticalAlignment="Middle">
-					<font size="7"/>
+					<font size="10"/>
 				</textElement>
 				<text><![CDATA[Tempo:]]></text>
 			</staticText>
 			<textField isBlankWhenNull="true">
-				<reportElement x="305" y="24" width="87" height="16"/>
+				<reportElement x="305" y="24" width="87" height="20"/>
 				<textElement verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
@@ -139,9 +128,9 @@ ORDER BY ITM.SEQITEM]]>
 		</band>
 	</title>
 	<columnHeader>
-		<band height="12" splitType="Stretch">
+		<band height="20" splitType="Stretch">
 			<staticText>
-				<reportElement x="2" y="0" width="45" height="12"/>
+				<reportElement x="2" y="0" width="45" height="20"/>
 				<box leftPadding="2">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -149,12 +138,12 @@ ORDER BY ITM.SEQITEM]]>
 					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement verticalAlignment="Middle">
-					<font size="5" isBold="true"/>
+					<font size="8" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Romaneio]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="47" y="0" width="120" height="12"/>
+				<reportElement x="47" y="0" width="120" height="20"/>
 				<box leftPadding="2">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -162,12 +151,12 @@ ORDER BY ITM.SEQITEM]]>
 					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement verticalAlignment="Middle">
-					<font size="5" isBold="true"/>
+					<font size="8" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Produtor]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="167" y="0" width="100" height="12"/>
+				<reportElement x="167" y="0" width="100" height="20"/>
 				<box leftPadding="2">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -175,12 +164,12 @@ ORDER BY ITM.SEQITEM]]>
 					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement verticalAlignment="Middle">
-					<font size="5" isBold="true"/>
+					<font size="8" isBold="true"/>
 				</textElement>
 				<text><![CDATA[UP:]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="267" y="0" width="123" height="12"/>
+				<reportElement x="267" y="0" width="123" height="20"/>
 				<box leftPadding="2">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -188,68 +177,68 @@ ORDER BY ITM.SEQITEM]]>
 					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement verticalAlignment="Middle">
-					<font size="5" isBold="true"/>
+					<font size="8" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Variedade]]></text>
 			</staticText>
 		</band>
 	</columnHeader>
 	<detail>
-		<band height="14" splitType="Stretch">
+		<band height="21" splitType="Stretch">
 			<textField isBlankWhenNull="true">
-				<reportElement x="2" y="0" width="45" height="14"/>
+				<reportElement x="2" y="0" width="45" height="20"/>
 				<box leftPadding="2">
 					<leftPen lineWidth="0.5"/>
 					<bottomPen lineWidth="0.5"/>
 					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement verticalAlignment="Middle">
-					<font size="5" isBold="true"/>
+					<font size="8" isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{NROUNICO}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="47" y="0" width="120" height="14"/>
+				<reportElement x="47" y="0" width="120" height="20"/>
 				<box leftPadding="2">
 					<leftPen lineWidth="0.5"/>
 					<bottomPen lineWidth="0.5"/>
 					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement verticalAlignment="Middle">
-					<font size="4"/>
+					<font size="7"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{PRODUTOR}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="167" y="0" width="100" height="14"/>
+				<reportElement x="167" y="0" width="100" height="20"/>
 				<box leftPadding="2">
 					<leftPen lineWidth="0.5"/>
 					<bottomPen lineWidth="0.5"/>
 					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement verticalAlignment="Middle">
-					<font size="4"/>
+					<font size="7"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{UP}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="267" y="0" width="123" height="14"/>
+				<reportElement x="267" y="0" width="123" height="20"/>
 				<box leftPadding="2">
 					<leftPen lineWidth="0.5"/>
 					<bottomPen lineWidth="0.5"/>
 					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement verticalAlignment="Middle">
-					<font size="4"/>
+					<font size="7"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{VARIEDADE}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
 	<summary>
-		<band height="115" splitType="Stretch">
+		<band height="123" splitType="Stretch">
 			<subreport>
-				<reportElement key="tht_control_detalhe" x="2" y="38" width="265" height="70"/>
+				<reportElement key="tht_control_detalhe" x="5" y="46" width="265" height="59"/>
 				<subreportParameter name="PK_SEQUENCIA">
 					<subreportParameterExpression><![CDATA[$P{PK_SEQUENCIA}]]></subreportParameterExpression>
 				</subreportParameter>
@@ -257,28 +246,28 @@ ORDER BY ITM.SEQITEM]]>
 				<subreportExpression class="java.lang.String"><![CDATA[$P{SUBREPORT_DIR} + "tht_control_detalhe.jrxml"]]></subreportExpression>
 			</subreport>
 			<staticText>
-				<reportElement x="275" y="3" width="35" height="16"/>
+				<reportElement x="275" y="16" width="42" height="16"/>
 				<textElement verticalAlignment="Middle">
-					<font size="8" isBold="true"/>
+					<font size="10" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Gaiola:]]></text>
 			</staticText>
 			<textField isBlankWhenNull="true">
-				<reportElement x="310" y="3" width="80" height="16"/>
+				<reportElement x="317" y="16" width="79" height="16"/>
 				<textElement verticalAlignment="Middle">
 					<font size="16" isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{IDGAIOLA}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="275" y="19" width="35" height="19"/>
+				<reportElement x="275" y="32" width="37" height="14"/>
 				<textElement verticalAlignment="Middle">
-					<font size="6" isBold="true"/>
+					<font size="10" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Lote:]]></text>
 			</staticText>
 			<image hAlign="Center">
-				<reportElement x="275" y="38" width="70" height="70"/>
+				<reportElement x="275" y="46" width="85" height="65"/>
 				<imageExpression class="java.awt.Image"><![CDATA[$F{QR_DATA} != null ?
     com.google.zxing.client.j2se.MatrixToImageWriter.toBufferedImage(
         new com.google.zxing.qrcode.QRCodeWriter().encode(
@@ -288,11 +277,25 @@ ORDER BY ITM.SEQITEM]]>
     ) : null]]></imageExpression>
 			</image>
 			<staticText>
-				<reportElement x="275" y="103" width="70" height="7"/>
+				<reportElement x="275" y="114" width="85" height="7"/>
 				<textElement textAlignment="Center">
 					<font size="4"/>
 				</textElement>
 				<text><![CDATA[ESCANEIE PARA DETALHES]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="317" y="1" width="79" height="15"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{CALIBRE}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="275" y="0" width="42" height="16"/>
+				<textElement verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Calibre:]]></text>
 			</staticText>
 		</band>
 	</summary>
